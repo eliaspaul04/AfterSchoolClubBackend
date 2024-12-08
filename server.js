@@ -3,6 +3,7 @@ const path = require('path');
 const MongoClient = require('mongodb').MongoClient;
 const app = express();
 const PORT = 3000;
+const { ObjectId } = require('mongodb'); // Imports ObjectID by ID
 
 // Middleware for JSON parsing
 app.use(express.json());
@@ -75,6 +76,40 @@ app.post('/orders', (req, res, next) => {
     });
 });
 
+app.put('/products/:id', (req, res, next) => {
+    const productId = req.params.id; // Extracts product ID from the URL
+
+    if (!productId) {
+        return res.status(400).send({ error: 'Product ID is missing in the request.' });
+    }
+
+    // Validate ObjectId format
+    if (!ObjectId.isValid(productId)) {
+        return res.status(400).send({ error: 'Invalid product ID format.' });
+    }
+
+    const updateData = req.body;
+
+    // Validates that updateData is an object
+    if (!updateData || typeof updateData !== 'object') {
+        return res.status(400).send({ error: 'Invalid update data.' });
+    }
+
+    // Update the product in the database
+    db.collection('products').updateOne(
+        { _id: new ObjectId(productId) }, 
+        { $set: updateData }, 
+        (err, result) => {
+            if (err) return next(err); 
+
+            if (result.matchedCount === 0) {
+                return res.status(404).send({ error: 'Product not found.' });
+            }
+
+            res.send({ message: 'Product updated successfully.' });
+        }
+    );
+});
 
 
 app.use((req, res) => {
