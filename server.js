@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 
 // MongoDB connection
 let db;
-const uri = 'mongodb+srv://ep04:eliaspaul2004@cluster0.iotzr.mongodb.net/'; // Use environment variables for sensitive data
+const uri = 'mongodb+srv://ep04:eliaspaul2004@cluster0.iotzr.mongodb.net/'; 
 
 MongoClient.connect(uri)
     .then(client => {
@@ -60,6 +60,21 @@ app.get('/products', (req, res, next) => {
         .then(results => res.send(results))
         .catch(err => next(err));
 });
+
+app.post('/orders', (req, res, next) => {
+    const orderData = req.body;
+
+    // Insert the data into the 'orders' collection
+    req.collection = db.collection('orders');
+    req.collection.insertOne(orderData, (err, result) => {
+        if (err) return next(err); 
+        res.status(201).send({ 
+            msg: 'Order successfully added', 
+            orderId: result.insertedId 
+        }); // Respond with success message and order ID
+    });
+});
+
 
 
 app.use((req, res) => {
