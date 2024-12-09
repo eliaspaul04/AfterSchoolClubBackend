@@ -159,12 +159,14 @@ app.put('/products/:id', (req, res, next) => {
 
 
 
-app.use(express.static(path.join('C:/Users/elias/OneDrive/Desktop/AfterSchoolClubFrontend')));
+app.use(express.static(path.join(__dirname, 'AfterSchoolClubFrontend')));
+
 
 // Catch-all route to serve the frontend's index.html for any unmatched routes
 app.get('*', (req, res) => {
-    res.sendFile(path.join('C:/Users/elias/OneDrive/Desktop/AfterSchoolClubFrontend/index.html'));
+    res.sendFile(path.join(__dirname, 'AfterSchoolClubFrontend', 'index.html'));
 });
+
 
 app.use((req, res) => {
     res.status(404).send('Page not found');
