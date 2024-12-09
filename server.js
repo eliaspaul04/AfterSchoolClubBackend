@@ -4,6 +4,29 @@ const MongoClient = require('mongodb').MongoClient;
 const app = express();
 const PORT = 3000;
 const { ObjectId } = require('mongodb'); // Imports ObjectID by ID
+const fs = require('fs');
+
+// Logger Middleware
+app.use((req, res, next) => {
+    const log = `[${new Date().toISOString()}] ${req.method} ${req.url}`;
+    console.log(log);
+    next(); // Passes control to the next middleware
+});
+
+app.use('/static', express.static(path.join(__dirname, 'public/Images')));
+
+const imagesPath = path.join(__dirname, 'public/Images');
+app.get('/images/:imageName', (req, res) => {
+    const imagePath = path.join(imagesPath, req.params.imageName);
+
+    fs.access(imagePath, fs.constants.F_OK, (err) => {
+        if (err) {
+            return res.status(404).send({ error: 'Image not found' });
+        }
+        res.sendFile(imagePath);
+    });
+});
+
 
 // Middleware for JSON parsing
 app.use(express.json());
@@ -22,11 +45,6 @@ app.use((req, res, next) => {
 
 // Serve static files from the current directory
 app.use(express.static(path.join(__dirname)));
-
-// Serve the HTML file
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
 
 // MongoDB connection
 let db;
@@ -49,6 +67,30 @@ app.param('collectionName', (req, res, next, collectionName) => {
     req.collection = db.collection(collectionName);
     next();
 });
+
+
+// API route for searching products
+app.get('/search', (req, res) => {
+    const searchQuery = req.query.q; // Extract query parameter 'q' from the request
+
+    if (!searchQuery || searchQuery.trim() === '') {
+        return res.status(400).send({ error: 'Search query is empty.' });
+    }
+
+    // Perform a case-insensitive search in the 'products' collection
+    db.collection('products')
+        .find({
+            title: { $regex: searchQuery, $options: 'i' }  // Case-insensitive search
+        })
+        .toArray()
+        .then(results => res.json(results)) // Send the results back to the client
+        .catch(err => {
+            console.error('Error during search:', err);
+            res.status(500).send({ error: 'An error occurred during search.' });
+        });
+});
+
+
 
 // API route to fetch products
 app.get('/products', (req, res, next) => {
@@ -111,6 +153,14 @@ app.put('/products/:id', (req, res, next) => {
     );
 });
 
+
+
+app.use(express.static(path.join('C:/Users/elias/OneDrive/Desktop/AfterSchoolClubFrontend')));
+
+// Catch-all route to serve the frontend's index.html for any unmatched routes
+app.get('*', (req, res) => {
+    res.sendFile(path.join('C:/Users/elias/OneDrive/Desktop/AfterSchoolClubFrontend/index.html'));
+});
 
 app.use((req, res) => {
     res.status(404).send('Page not found');
