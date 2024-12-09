@@ -9,8 +9,8 @@ const fs = require('fs');
 // Logger Middleware
 app.use((req, res, next) => {
     const log = `[${new Date().toISOString()}] ${req.method} ${req.url}`;
-    console.log(log);
-    next(); // Passes control to the next middleware
+    console.log(log);// Logs each incoming request with timestamp, method, and URL
+    next(); 
 });
 
 app.use('/static', express.static(path.join(__dirname, 'public/Images')));
@@ -69,6 +69,7 @@ app.param('collectionName', (req, res, next, collectionName) => {
 });
 
 
+
 // API route for searching products
 app.get('/search', (req, res) => {
     const searchQuery = req.query.q; // Extract query parameter 'q' from the request
@@ -89,6 +90,9 @@ app.get('/search', (req, res) => {
             res.status(500).send({ error: 'An error occurred during search.' });
         });
 });
+
+
+
 
 
 
