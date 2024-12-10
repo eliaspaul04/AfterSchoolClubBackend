@@ -159,12 +159,11 @@ app.put('/products/:id', (req, res, next) => {
 
 
 
-app.use(express.static(path.join(__dirname, 'AfterSchoolClubFrontend')));
-
+app.use(express.static(path.join('C:/Users/elias/OneDrive/Desktop/AfterSchoolClubFrontend')));
 
 // Catch-all route to serve the frontend's index.html for any unmatched routes
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'AfterSchoolClubFrontend', 'index.html'));
+    res.sendFile(path.join('C:/Users/elias/OneDrive/Desktop/AfterSchoolClubFrontend/index.html'));
 });
 
 
