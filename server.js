@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const MongoClient = require('mongodb').MongoClient;
 const { ObjectId } = require('mongodb');
 
@@ -12,6 +13,22 @@ app.use(express.json());
 app.use(cors({
     origin: 'https://eliaspaul04.github.io'
 }));
+
+const imagesPath = path.join(__dirname, 'public', 'Images');
+
+app.get('/images/:imageName', (req, res) => {
+    const imagePath = path.join(imagesPath, req.params.imageName);
+
+    fs.access(imagePath, fs.constants.F_OK, (err) => {
+        if (err) {
+            return res.status(404).json({
+                error: 'Image not found'
+            });
+        }
+
+        res.sendFile(imagePath);
+    });
+});
 
 // Logger
 app.use((req, res, next) => {
