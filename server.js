@@ -14,21 +14,7 @@ app.use(cors({
     origin: 'https://eliaspaul04.github.io'
 }));
 
-const imagesPath = path.join(__dirname, 'public', 'Images');
-
-app.get('/images/:imageName', (req, res) => {
-    const imagePath = path.join(imagesPath, req.params.imageName);
-
-    fs.access(imagePath, fs.constants.F_OK, (err) => {
-        if (err) {
-            return res.status(404).json({
-                error: 'Image not found'
-            });
-        }
-
-        res.sendFile(imagePath);
-    });
-});
+app.use('/images', express.static(path.join(__dirname, 'public', 'Images')));
 
 // Logger
 app.use((req, res, next) => {
