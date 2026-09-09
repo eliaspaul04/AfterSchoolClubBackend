@@ -28,13 +28,18 @@ if (!uri) {
     console.error('MONGODB_URI environment variable is not set.');
 }
 
-MongoClient.connect(uri)
-    .then(client => {
+const client = new MongoClient(uri, {
+    family: 4,
+    serverSelectionTimeoutMS: 30000
+});
+
+client.connect()
+    .then(() => {
         db = client.db('webstore');
         console.log('Connected to MongoDB');
     })
     .catch(err => {
-        console.error('Error connecting to MongoDB:', err.message);
+        console.error('Error connecting to MongoDB:', err);
     });
 
 // Search products
